@@ -1,0 +1,19 @@
+{
+        "Filters" : {
+            "diallel": {
+                "rules": [
+                    {
+                        "trait": "HETGP_GCV",
+                        "operator": "in",
+                        "value": "A_A, 678_678, 83_678"
+                    },
+                    {
+                        "trait": "SC_INBRDSTG_GCV",
+                        "operator": "in",
+                        "value": "PS2_PS2, PS2_PS3,PS2_PS3,PS3_PS3,PS2_CM,PS3_CM,CM_CM,CM_P1,CM_P2,CM_P3"
+                    }
+            ]   
+            }
+        }
+
+}

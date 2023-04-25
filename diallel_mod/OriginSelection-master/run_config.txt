@@ -1,0 +1,29 @@
+### Unit test
+def parse_argument():
+    parser = argparse.ArgumentParser(description='parse arguments for materialized view.')
+    parser.add_argument('--gcafile', dest='gcafile', help='path to a gca master table.', required = False, default='ycao1/OriginSelection/Corn/Temperate_GCA_masterfile_test.csv')
+    parser.add_argument('--bucket', dest='bucket', help='S3 bucket where gca master table is saved.', required = False, default = 'veg-apd-sdi-predictiveanalytcs-prod-workspace')
+    parser.add_argument('--scafile', dest='scafile', help='path to a sca master table. This is optional input.')
+    parser.add_argument('--keyinbred', dest='keyinbred', help='path to key inbred lists provide by breeders. The inbred list should be saved as csv file. This is optional input.', default='/mnt/TempSC/2020_key_inbred_lines_tempSC.csv')
+    parser.add_argument('--het', dest='het', nargs = "+", help='heterotic group for filtering. This is optional input.', default='"678 83 89 A SLM804"')
+    parser.add_argument('--config', dest='config', help='path to a configuration file where filtering criteria is stored as a dictionary in a txt file.', default='/mnt/config.txt')
+    parser.add_argument('--local_path', dest='local_path', help='path to save output locally.', required = False, default='/mnt/TempSC/diallel_test.csv')
+    parser.add_argument('--s3_path', dest='s3_path', help='path to write output to s3', default='ycao1/OriginSelection/Corn/DiallelTable/+OriginSelection/diallel_test.csv')
+    
+    args = parser.parse_args()
+    
+    return args
+
+
+#### Unit test
+## All the args    
+
+python3 -m runScript --gcafile ycao1/OriginSelection/master_wide_test.csv --bucket veg-apd-sdi-predictiveanalytcs-prod-workspace --keyinbred /mnt/TempSC/2020_key_inbred_lines_tempSC.csv --het 678 83 89 A SLM804 --config /mnt/config.txt --local_path /mnt/TempSC/diallel_test.csv --s3_path ycao1/OriginSelection/Corn/DiallelTable/+OriginSelection/diallel_test.csv
+
+#### Unit test
+## Only required args  
+python3 -m runScript --gcafile ycao1/OriginSelection/master_wide_test.csv --bucket veg-apd-sdi-predictiveanalytcs-prod-workspace --local_path /mnt/TempSC/diallel_test.csv
+
+
+### Unit test for Hybrid Prediction
+python3 -m runScript --gcafile ycao1/OriginSelection/Corn/master_wide_test.csv --bucket veg-apd-sdi-predictiveanalytcs-prod-workspace --keyinbred /mnt/TempSC/2020_key_inbred_lines_tempSC.csv --het 678 83 89 A SLM804 --config /mnt/config.txt --local_path /mnt/TempSC/diallel_test.csv --s3_path ycao1/OriginSelection/Corn/DiallelTable/+OriginSelection/diallel_test.csv
