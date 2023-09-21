@@ -28,6 +28,13 @@ get_pedigree <- function(GermID, print_fails = F){
   #FamilyJson <- pingSecuredGet(CallString, timeOut = 40)
   #FamilyJson <- GET(CallString, add_headers(Authorization = BEARER_TOKEN))
   token_gen <- azure_api_client(Sys.getenv("CLIENT_ID"), Sys.getenv("CLIENT_SECRET"))
+  
+  # Increase Time out
+  httr::GET(
+    "https://product360.agro.services/ancestry/v1/germplasm/",
+    httr::add_headers(Authorization = paste("Bearer", token_gen$token)),
+    httr::timeout(600)  # Sets timeout to 600 seconds
+  )
   FamilyJson <- azure_get(CallString,list(token = token_gen$token, token_type = token_gen$token_type))
   
   if (FamilyJson$status_code == '200') {
