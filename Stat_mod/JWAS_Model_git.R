@@ -218,6 +218,10 @@ getoutput = function(out,dataset,trait,gg,n_gen=5,seas=NULL,method){
   write(paste0('import Pkg; Pkg.add(Pkg.PackageSpec(;name="CSV", version="0.6.2"))'), log, append=T)
   write(paste0('import Pkg; Pkg.add(Pkg.PackageSpec(;name="JWAS", version="0.9.0"))'), log, append=T)
   
+  write(paste0('using CSV'), log, append=T)
+  write(paste0('using DataFrames'), log, append=T)
+  write(paste0('using JWAS'), log, append=T)
+  
   write(paste0('using JWAS,JWAS.Datasets,DataFrames,CSV,LinearAlgebra'), log, append=T)
   write(paste0('phenotypes = CSV.read("testphenos_jwas.txt",delim = ",",header=true,missingstrings=["NA"])'), log, append=T)
   
