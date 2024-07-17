@@ -44,18 +44,20 @@ getoutput = function(out,dataset,trait,gg,n_gen=5,seas=NULL,method){
   bdat    = my_list$bdat
   random0 = my_list$random
   fix0    = my_list$fix
-  pd      = my_list$pd
+  pd      = my_list$pd %>%
+    mutate(ID = as.numeric(ID),
+           PARENT_MALE = as.numeric(PARENT_MALE),
+           PARENT_FEMALE = as.numeric(PARENT_FEMALE))
   
   print("bdat,random effects and pedigree finished")
   ##########
   # pedigree initial formatting
   ##########
   
-  tmp = left_join(pd, cropids, by=c('ID'='M.GERMPLASM.X_ID'))
-  tmp = left_join(tmp, cropids, by=c('PARENT_FEMALE'='M.GERMPLASM.X_ID'))
-  tmp = left_join(tmp, cropids, by=c('PARENT_MALE'='M.GERMPLASM.X_ID'))
-  tmp = tmp[, c('M.GERMPLASM.PEDIGREE.x', 'M.GERMPLASM.PEDIGREE.y', 'M.GERMPLASM.PEDIGREE')]
-  colnames(tmp) =  c("ID", "PARENT_FEMALE", "PARENT_MALE")
+  tmp = left_join(pd, cropids, by=c('ID'='M.GERMPLASM.X_ID')) %>% dplyr::rename(Pedigree = M.GERMPLASM.PEDIGREE)
+  tmp = left_join(tmp, cropids, by=c('PARENT_FEMALE'='M.GERMPLASM.X_ID')) %>% dplyr::rename(P1 = M.GERMPLASM.PEDIGREE)
+  tmp = left_join(tmp, cropids, by=c('PARENT_MALE'='M.GERMPLASM.X_ID')) %>% dplyr::rename(P2 = M.GERMPLASM.PEDIGREE)
+  tmp = tmp[, c('Pedigree', 'P1', 'P2')]
   tmp$inbreeding =pd$inbreeding
   names(tmp) <- c('Pedigree', 'P1', 'P2', 'inbreeding')
   pd<-tmp%>%dplyr::select('Pedigree', 'P1', 'P2', 'inbreeding')
@@ -63,7 +65,7 @@ getoutput = function(out,dataset,trait,gg,n_gen=5,seas=NULL,method){
   # simplify pedigree ID 
   
   if(is.null(gg) == FALSE){
-    id = data.frame('PEDIGREE_NAME'=c(as.character(bdat$PEDIGREE_NAME), as.character(pd$Pedigree), as.character(pd$P1), as.character(pd$P2), as.character(gg$PEDIGREE)), 'PEDIGREE_NAME_ID'=NA)
+    id = data.frame('PEDIGREE_NAME'=c(as.character(bdat$PEDIGREE_NAME), as.character(pd$Pedigree), as.character(pd$P1), as.character(pd$P2), as.character(gg$PEDIGREE_NAME)), 'PEDIGREE_NAME_ID'=NA)
   }else{
     id = data.frame('PEDIGREE_NAME'=c(as.character(bdat$PEDIGREE_NAME), as.character(pd$Pedigree), as.character(pd$P1), as.character(pd$P2)), 'PEDIGREE_NAME_ID'=NA)
   }
@@ -77,15 +79,34 @@ getoutput = function(out,dataset,trait,gg,n_gen=5,seas=NULL,method){
   id$PEDIGREE_NAME_ID[is.na(id$PEDIGREE_NAME)] = 0
   
   #pd0 = pd
-  pd  = left_join(pd, id, by=c('Pedigree'='PEDIGREE_NAME'))
-  pd  = left_join(pd, id, by=c('P1'='PEDIGREE_NAME'))
-  pd  = left_join(pd, id, by=c('P2'='PEDIGREE_NAME'))
-  pd  = pd[, c('PEDIGREE_NAME_ID.x', 'PEDIGREE_NAME_ID', 'PEDIGREE_NAME_ID.y')]
-  colnames(pd) = c('PEDIGREE_NAME', 'P2', 'P1')
+  # pd  = left_join(pd, id, by=c('Pedigree'='PEDIGREE_NAME'))
+  # pd  = left_join(pd, id, by=c('P1'='PEDIGREE_NAME'))
+  # pd  = left_join(pd, id, by=c('P2'='PEDIGREE_NAME'))
+  # pd  = pd[, c('PEDIGREE_NAME_ID.x', 'PEDIGREE_NAME_ID', 'PEDIGREE_NAME_ID.y')]
+  # colnames(pd) = c('PEDIGREE_NAME', 'P2', 'P1')
+  # pd$V4 = 0
+  # pd$V5 = 0
+  # pddir = paste0(outbox, '/rawpedigree.txt')
+  # write.table(pd, file=pddir, quote=F, sep=' ', row.names=F, col.names =F)
+  
+  pd <- bdat %>%
+    select(PEDIGREE_NAME, P1, P2) %>%
+    unique() %>%
+    left_join(id) %>%
+    dplyr::rename(ID_Pedigree = PEDIGREE_NAME_ID) %>%
+    left_join(id, by = c("P1" = "PEDIGREE_NAME")) %>%
+    dplyr::rename(ID_P1 = PEDIGREE_NAME_ID) %>%
+    left_join(id, by = c("P2" = "PEDIGREE_NAME")) %>%
+    dplyr::rename(ID_P2 = PEDIGREE_NAME_ID) %>%
+    select(ID_Pedigree, ID_P1, ID_P2) %>%
+    dplyr::rename(Pedigree = ID_Pedigree,
+                  P1 = ID_P1,
+                  P2 = ID_P2)
   pd$V4 = 0
   pd$V5 = 0
   pddir = paste0(outbox, '/rawpedigree.txt')
   write.table(pd, file=pddir, quote=F, sep=' ', row.names=F, col.names =F)
+  
   
   #### equivalency ID and pedigree name needed to output GEBV 
   #### for every ID code and not only for ID with NA in phenotype file
@@ -99,11 +120,11 @@ getoutput = function(out,dataset,trait,gg,n_gen=5,seas=NULL,method){
   ##########
   if(is.null(gg)==FALSE){
   s = gg
-  s = s[is.element(s$PEDIGREE, c(bdat$PEDIGREE_NAME, bdat$P1, bdat$P2)), ]
-  s = left_join(s, id, by=c('PEDIGREE'='PEDIGREE_NAME'))
+  s = s[is.element(s$PEDIGREE_NAME, c(bdat$PEDIGREE_NAME, bdat$P1, bdat$P2)), ]
+  s = left_join(s, id, by='PEDIGREE_NAME')
   PEDIGREE_NAME_ID = s$PEDIGREE_NAME_ID
   s<-data.frame(s)
-  ss = s[, is.element(colnames(s), c('PEDIGREE', 'ProgenyGermID', 'PEDIGREE_NAME_ID'))==F]
+  ss = s[, is.element(colnames(s), c('PEDIGREE_NAME', 'ProgenyGermID', 'PEDIGREE_NAME_ID'))==F]
   ss = as.data.frame(ss)
   colnames(ss)<-paste0("m",seq(1:ncol(ss)))
   dat<-data.frame("ID"=PEDIGREE_NAME_ID,ss)

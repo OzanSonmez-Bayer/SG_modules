@@ -119,8 +119,8 @@ getbdat = function(dataset, n_gen=5){
   #row_no = pd[which(ord==-1),]
   #pd <- pd[order(ord),]
   #pd = pd%>%filter(!ID==row_no$ID)
-  
-  pd.ainv <- asreml.Ainverse(pd, fgen = c('inbreeding', n_gen))
+  pd0 <- pd %>% filter(!is.na(ID))
+  pd.ainv <- asreml.Ainverse(pd0, fgen = c('inbreeding', n_gen))
   inbreeding = pd.ainv$inbreeding
   pd$inbreeding <- inbreeding
   #pd <- data.frame(peds$pd, inbreeding)
