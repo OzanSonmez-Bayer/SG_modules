@@ -19,7 +19,7 @@ library(azurequest)
 # simple: get 1 generation of binary parents only from pedigree (will return more if inbreeding loop)
 get_pedigree <- function(GermID, print_fails = F){
   
-  CLIENT_SECRET = "65G8Q~M6jb.QjDCLCpjZk2ZOfYo5fGcpaHeCFc2W"
+  CLIENT_SECRET = "d168Q~D_O3-6pnNqsEnBkQWXH.PIWySvWz_Rnb3."
   CLIENT_ID = "599849ba-355c-48aa-8154-994ab3dd79b1"
   Sys.setenv("CLIENT_ID"= CLIENT_ID, "CLIENT_SECRET"= CLIENT_SECRET)
   
@@ -232,7 +232,8 @@ make_ped_file <- function(df, crop_ids = CropIDs, n_gen = 1){ # list of IDs and 
   }
   
   peds_sorted <- sort_pedigree(peds_found) %>%
-    mutate(order_id = 1:nrow(.)) %>%
+    mutate(order_id = 1:nrow(.),
+           ID = as.numeric(ID)) %>%
     left_join(., distinct(crop_ids[ , c("M.GERMPLASM.X_ID", "M.GENETICMATERIAL.GENERATION")]), 
               by = c("ID"="M.GERMPLASM.X_ID")) %>%
     left_join(., distinct_lines, by = c("ID"="germplasm_id")) %>%
