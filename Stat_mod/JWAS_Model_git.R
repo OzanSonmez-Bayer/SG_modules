@@ -1,6 +1,6 @@
 #7 March added method GBLUP
 
-getoutput = function(out,dataset,trait,gg,n_gen=5,seas=NULL,method){
+getoutput = function(out,dataset,trait,gg,n_gen=5,seas=NULL,method,make_ped_pd_all){
   #@method= SSGBLUP,GBLUP,ABLUP : it builds the model differently for julia but it does not format the input data differently
   #@out : folder name of the analysis
   #@dataset : phenotypic file after UOM conversion
@@ -39,7 +39,7 @@ getoutput = function(out,dataset,trait,gg,n_gen=5,seas=NULL,method){
   ####################
   
   # add P1 and P2
-  my_list = getbdat(dataset=dat1, n_gen=5)
+  my_list = getbdat(dataset=dat1, n_gen=5, make_ped_pd_all)
   
   bdat    = my_list$bdat
   random0 = my_list$random

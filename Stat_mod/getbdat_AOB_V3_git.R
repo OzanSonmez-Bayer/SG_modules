@@ -1,5 +1,5 @@
 # get cleaned bdat based on dat_2
-getbdat = function(dataset, n_gen=5){
+getbdat = function(dataset, n_gen=5, make_ped_pd_all){
   #dataworker 
   #bmrd.field_name:bmrd.rep_number 
   #bmrd.field_name 
@@ -38,7 +38,12 @@ getbdat = function(dataset, n_gen=5){
   
   print("starting making ped file")
   
-  peds = make_ped_file(df = bdat, crop_ids=CropIDs, n_gen = n_gen)
+  # peds = make_ped_file(df = bdat, crop_ids=CropIDs, n_gen = n_gen)
+  pd <- make_ped_pd_all %>%
+    filter(pedigree %in% unique(c(bdat$PEDIGREE_NAME, bdat$P1, bdat$P2))) %>%
+    filter(!is.na(pedigree))
+  
+  pd = unique(pd)
   
   print("finish making ped file")
   
@@ -90,9 +95,7 @@ getbdat = function(dataset, n_gen=5){
     print(randof)
     fix <- formula('TRAIT_VALUE~1')
   }
-    
-  pd <- peds$ped
-  pd = unique(pd)
+  
   
   
   # replace n_gen with Inf inbreedings and calculate A matrix inverse here:
@@ -121,8 +124,8 @@ getbdat = function(dataset, n_gen=5){
   #pd = pd%>%filter(!ID==row_no$ID)
   pd0 <- pd %>% filter(!is.na(ID))
   pd.ainv <- asreml.Ainverse(pd0, fgen = c('inbreeding', n_gen))
-  inbreeding = pd.ainv$inbreeding
-  pd$inbreeding <- inbreeding
+  pd = pd.ainv$pedigree %>% mutate(inbreeding = pd.ainv$inbreeding) %>% filter(ID %in% pd0$ID)
+  #pd$inbreeding <- inbreeding
   #pd <- data.frame(peds$pd, inbreeding)
   
   pd <- pd[!duplicated(pd[,1]),]
