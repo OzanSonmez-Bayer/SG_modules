@@ -122,16 +122,24 @@ getbdat = function(dataset, n_gen=5, make_ped_pd_all){
   #row_no = pd[which(ord==-1),]
   #pd <- pd[order(ord),]
   #pd = pd%>%filter(!ID==row_no$ID)
-  pd0 <- pd %>% filter(!is.na(ID))
-  pd.ainv <- asreml.Ainverse(pd0, fgen = c('inbreeding', n_gen))
-  pd = pd.ainv$pedigree %>% mutate(inbreeding = pd.ainv$inbreeding) %>% filter(ID %in% pd0$ID)
+  #pd0 <- pd %>% filter(!is.na(ID)) 
+  #pd.ainv <- asreml.Ainverse(pd0, fgen = c('inbreeding', n_gen))
+  #pd = pd.ainv$pedigree %>% mutate(inbreeding = pd.ainv$inbreeding) %>% filter(ID %in% pd0$ID)
   #pd$inbreeding <- inbreeding
   #pd <- data.frame(peds$pd, inbreeding)
   
   pd <- pd[!duplicated(pd[,1]),]
+  id_ped <- pd %>% select(ID, pedigree) %>% unique() %>% group_by(pedigree) %>% summarise(id = ID[1]) %>% ungroup()
+  pd2 <- pd %>% left_join(id_ped, by = c("PARENT_FEMALE" = "pedigree")) %>% dplyr::rename(female_id = id)
+  pd2 <- pd2 %>% left_join(id_ped, by = c("PARENT_MALE" = "pedigree")) %>% dplyr::rename(male_id = id)
+  pd3 <- pd2 %>%
+    select(-c(PARENT_FEMALE, PARENT_MALE)) %>%
+    dplyr::rename(PARENT_FEMALE = female_id,
+                  PARENT_MALE = male_id) %>%
+    select(ID, pedigree, PARENT_FEMALE, PARENT_MALE, parent_pedigree, inbreeding)
   ##names(pd) <- c('Pedigree', 'P1', 'P2', 'inbreeding')
   
-  my_list = list("bdat" = bdat, "random" = randof, "fix" = fix, "pd"=pd)
+  my_list = list("bdat" = bdat, "random" = randof, "fix" = fix, "pd"=pd3)
   return(my_list) 
 }
 
