@@ -18,9 +18,9 @@ getbdat = function(dataset, n_gen=5, make_ped_pd_all){
   #ped(PEDIGREE_NAME) 
   #R 
   
-  if (is.null(CropIDs)){ # send warning if crop_ids is NULL, i.e. didn't load
-    "A-matrix BLUP model cannot run without loading s3 bucket CropIDs dataframe. Please check and try again."
-  }
+  # if (is.null(CropIDs)){ # send warning if crop_ids is NULL, i.e. didn't load
+  #   "A-matrix BLUP model cannot run without loading s3 bucket CropIDs dataframe. Please check and try again."
+  # }
   
   #dataset<-dat
   #trtList <- unique(dataset$OBSRVTN_REF_CD)
