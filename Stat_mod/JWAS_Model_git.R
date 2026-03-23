@@ -185,6 +185,9 @@ getoutput = function(out,dataset,trait,gg,n_gen=5,seas=NULL,method,make_ped_pd_a
   parents2<-data.frame("ID"=ped_jwas$Dam,"Sire"=0,"Dam"=0) 
   all_ped<-rbind(ped_jwas,parents1,parents2)
   all_ped=all_ped[!duplicated(all_ped$ID),]
+  all_ped$ID   <- trimws(as.character(all_ped$ID))
+  all_ped$Sire <- trimws(as.character(all_ped$Sire))
+  all_ped$Dam  <- trimws(as.character(all_ped$Dam))
   jlpeddir = paste0(outbox, '/testped_jwas.txt')
   write.table(all_ped, file=jlpeddir, quote=F, sep=',', row.names=F, col.names =T)
   
@@ -201,6 +204,8 @@ getoutput = function(out,dataset,trait,gg,n_gen=5,seas=NULL,method,make_ped_pd_a
   genos<-dat[dat$ID%in%all_ped$ID,]
   jlgenodir = paste0(outbox, '/testgenos_jwas.txt')
   #fwrite
+  genos$ID <- trimws(as.character(genos$ID))
+  genos<-genos[genos$ID != "0",]
   write.table(genos,file=jlgenodir,quote=F, sep=',', row.names=F, col.names =TRUE)
   print("writing genotype file")
   }
