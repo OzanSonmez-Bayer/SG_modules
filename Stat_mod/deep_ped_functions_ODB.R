@@ -19,8 +19,7 @@ library(azurequest)
 # simple: get 1 generation of binary parents only from pedigree (will return more if inbreeding loop)
 get_pedigree <- function(GermID, print_fails = F){
   
-  CLIENT_SECRET = "d168Q~D_O3-6pnNqsEnBkQWXH.PIWySvWz_Rnb3."
-  CLIENT_ID = "599849ba-355c-48aa-8154-994ab3dd79b1"
+
   Sys.setenv("CLIENT_ID"= CLIENT_ID, "CLIENT_SECRET"= CLIENT_SECRET)
   
   CallString = paste0("https://product360.agro.services/ancestry/v1/germplasm/", GermID,"/binary-parents?depth=1&props=lineCode")
