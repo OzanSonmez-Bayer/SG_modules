@@ -40,9 +40,7 @@ def get_aws_cred(vault_path, token):
     return response.json()['data']
     
 
-vault_role_id = "91ea26fe-50e9-9214-90af-2391a8ddce7f"
-vault_secret_id = "db08de7e-d19b-f6ca-7016-bd23cc0f6d86"
-vault_path = 'veg-pipeline-solutions/prod/aws/bay-veg-apd-sdi-predictive-analytics-prod/veg-apd-sdi-pa-s3read'
+
 token = get_vault_token(vault_role_id, vault_secret_id)
 resp = get_aws_cred(vault_path, token)
 
